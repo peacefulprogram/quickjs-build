@@ -133,21 +133,21 @@ async function buildProject() {
      */
     const buildParams = []
     const ndkPath = normalizePath(findNdk())
-    for (const target in androidTargets) {
-        const buildDir = 'build/' + target
-        buildParams.push({
-            target: target,
-            buildDir: buildDir,
-            configureCommands: ['cmake', '-G', 'Ninja', '-S', '.', '-B', buildDir, `-DCMAKE_TOOLCHAIN_FILE=${ndkPath}/build/cmake/android.toolchain.cmake`, `-DANDROID_ABI=${androidTargets[target]}`, '-DCMAKE_BUILD_TYPE=Release'],
-            buildCommands: ['cmake', '--build', buildDir, '--target', 'qjs']
-        })
-    }
     for (const target in zigTargets) {
         const buildDir = 'build/' + target
         buildParams.push({
             target,
             buildDir,
             configureCommands: ['cmake', '-G', 'Ninja', '-S', '.', '-B', buildDir, '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_TOOLCHAIN_FILE=' + normalizePath(join(toolchainDir, zigTargets[target] + '.cmake'))],
+            buildCommands: ['cmake', '--build', buildDir, '--target', 'qjs']
+        })
+    }
+    for (const target in androidTargets) {
+        const buildDir = 'build/' + target
+        buildParams.push({
+            target: target,
+            buildDir: buildDir,
+            configureCommands: ['cmake', '-G', 'Ninja', '-S', '.', '-B', buildDir, `-DCMAKE_TOOLCHAIN_FILE=${ndkPath}/build/cmake/android.toolchain.cmake`, `-DANDROID_ABI=${androidTargets[target]}`, '-DCMAKE_BUILD_TYPE=Release'],
             buildCommands: ['cmake', '--build', buildDir, '--target', 'qjs']
         })
     }
