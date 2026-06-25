@@ -30,7 +30,12 @@ jobs:
       - name: Generate tag
         id: tag
         run: |
-          TAG=$(TZ=Asia/Shanghai date +"%Y%m%d%H%M%S")
+          VERSION=$(grep -oE "version:[[:space:]]*'[^']+'" quickjs/meson.build | sed -E "s/.*'([^']+)'/\1/")
+          TIMESTAMP=$(TZ=Asia/Shanghai date +"%Y%m%d%H%M%S")
+
+          TAG="v${VERSION}-${TIMESTAMP}"
+
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
       - name: Zip lib directory
@@ -42,5 +47,6 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
-          name: ${{ steps.tag.outputs.tag }}
+          name: quickjs ${{ steps.tag.outputs.version }}
           files: quickjs.zip
+          body: quickjs ${{ steps.tag.outputs.version }}
