@@ -110,12 +110,20 @@ async function buildProject() {
         'android-arm64': 'arm64-v8a'
     }
     /**
-     * @type {Record<string, {arch:string;sys:string;}>}
+     * @type {Record<string, {arch:string;sysName:string;sysRoot:string;}>}
      */
-    const iosTargets = {
-        'ios-arm64': { arch: 'arm64', sys: 'iphoneos' },
-        'ios-sim-arm64': { arch: 'arm64', sys: 'iphonesimulator' },
-        'ios-x64': { arch: 'x86_64', sys: 'iphonesimulator' }
+    const appleTargets = {
+        'ios-arm64': { arch: 'arm64', sysRoot: 'iphoneos', sysName: 'iOS' },
+        'ios-sim-arm64': { arch: 'arm64', sysRoot: 'iphonesimulator', sysName: 'iOS' },
+        'ios-x64': { arch: 'x86_64', sysRoot: 'iphonesimulator', sysName: 'iOS' },
+        'watchos-arm64': { arch: 'arm64_32', sysRoot: 'watchos', sysName: 'watchOS' },
+        'watchos-device-arm64': { arch: 'arm64', sysRoot: 'watchos', sysName: 'watchOS' },
+        'watchos-sim-arm64': { arch: 'arm64', sysRoot: 'watchsimulator', sysName: 'watchOS' },
+        'watchos-x64': { arch: 'x86_64', sysRoot: 'watchsimulator', sysName: 'watchOS' },
+        'watchos-arm32': { arch: 'armv7k', sysRoot: 'watchos', sysName: 'watchOS' },
+        'tvos-arm64': { arch: 'arm64', sysRoot: 'appletvos', sysName: 'tvOS' },
+        'tvos-sim-arm64': { arch: 'arm64', sysRoot: 'appletvsimulator', sysName: 'tvOS' },
+        'tvos-x64': { arch: 'x86_64', sysRoot: 'appletvsimulator', sysName: 'tvOS' },
     }
     const macOsTargets = {
         'macos-x64': 'x86_64',
@@ -152,13 +160,13 @@ async function buildProject() {
         })
     }
     if (type === 'Darwin') {
-        for (const target in iosTargets) {
+        for (const target in appleTargets) {
             const buildDir = 'build/' + target
-            const { arch, sys } = iosTargets[target]
+            const { arch, sysRoot, sysName } = appleTargets[target]
             buildParams.push({
                 target: target,
                 buildDir: buildDir,
-                configureCommands: ['cmake', '-S', '.', '-B', buildDir, '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_OSX_ARCHITECTURES=' + arch, '-DCAMKE_SYSTEM_NAME=iOS', '-DCMAKE_OSX_SYSROOT=' + sys],
+                configureCommands: ['cmake', '-S', '.', '-B', buildDir, '-DCMAKE_BUILD_TYPE=Release', '-DCMAKE_OSX_ARCHITECTURES=' + arch, '-DCAMKE_SYSTEM_NAME=' + sysName, '-DCMAKE_OSX_SYSROOT=' + sysRoot],
                 buildCommands: ['cmake', '--build', buildDir, '--target', 'qjs']
             })
         }
